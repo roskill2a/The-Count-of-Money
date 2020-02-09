@@ -6,33 +6,28 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
-import {login} from '../Actions/login';
+import {register} from '../Actions/register';
 import {connect} from 'react-redux';
 
-class SignInScreen extends React.Component {
+class SignUpScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: undefined,
+      firstName: undefined,
+      lastName: undefined,
       password: undefined,
     };
   }
 
-  static navigationOptions = {
-    title: 'Please sign in',
-  };
-
-  componentDidUpdate() {
-    if (this.props.res.isAuthenticated) {
-      this.props.navigation.navigate('App');
-    }
-  }
-
-  _signInAsync = async () => {
+  _signInAsync = () => {
     // eslint-disable-next-line no-shadow
-    const {login} = this.props;
+    const {register} = this.props;
+    const {email, password, firstName, lastName} = this.state;
     try {
-      await login(this.state.email, this.state.password);
+      register(email, firstName, lastName, password);
+      const result = this.props.res.payload.success;
+      this.props.navigation.navigate(result ? 'SignIn' : 'SignUp');
     } catch (error) {
       console.error('error', error);
     }
@@ -41,8 +36,20 @@ class SignInScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>SIGN IN</Text>
+        <Text style={styles.title}>Register</Text>
         <View style={styles.formContent}>
+          <TextInput
+            placeholder="First name"
+            onChangeText={firstName => this.setState({firstName})}
+            style={styles.formInput}
+            value={this.state.firstName}
+          />
+          <TextInput
+            placeholder="Last name"
+            onChangeText={lastName => this.setState({lastName})}
+            style={styles.formInput}
+            value={this.state.lastName}
+          />
           <TextInput
             placeholder="Email"
             keyboardType={'email-address'}
@@ -62,26 +69,21 @@ class SignInScreen extends React.Component {
           <TouchableOpacity
             style={styles.buttonForm}
             onPress={this._signInAsync}>
-            <Text>Sign In!</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonForm}
-            onPress={() => this.props.navigation.navigate('SignUp')}>
-            <Text>Sign UP!</Text>
+            <Text>Sign Up!</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   }
 }
-
 const mapStateToProps = state => ({
   res: state.auth,
 });
 
 const mapDispatchToProps = dispatch => {
   return {
-    login: (email, password) => dispatch(login(email, password)),
+    register: (email, firstName, lastName, password) =>
+      dispatch(register(email, firstName, lastName, password)),
   };
 };
 
@@ -119,4 +121,4 @@ const styles = StyleSheet.create({
 });
 
 // eslint-disable-next-line prettier/prettier
-export default connect(mapStateToProps, mapDispatchToProps)(SignInScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SignUpScreen);
