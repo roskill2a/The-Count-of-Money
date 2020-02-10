@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {
   Container,
   Content,
@@ -10,6 +10,9 @@ import {
   Right,
   Thumbnail,
   Text,
+  Header,
+  Title,
+  Icon,
 } from 'native-base';
 import {getListCryptos} from '../Actions/crypto';
 import {SvgUri} from 'react-native-svg';
@@ -26,18 +29,35 @@ class HomeScreen extends React.Component {
     this.props.getListCryptos();
   }
 
+  checkPercentage = item => {
+    const percent = (item.currentPrice - item.openingPrice) * 100;
+    if (item.currentPrice > item.openingPrice) {
+      return (
+        <View style={{alignItems: 'center'}}>
+          <Icon type="AntDesign" name="arrowup" style={{color: 'green'}} />
+          <Text style={{color: 'green'}}>{percent.toFixed(2)} %</Text>
+        </View>
+      );
+    } else {
+      return (
+        <View style={{alignItems: 'center'}}>
+          <Icon type="AntDesign" name="arrowdown" style={{color: 'red'}} />
+          <Text style={{color: 'red'}}>{percent.toFixed(2)} %</Text>
+        </View>
+      );
+    }
+  };
+
   renderRowList = () => {
-    const {res} = this.props;
-    return res.data.map((item, index) => {
-      console.log('item', item);
+    const {crypto} = this.props;
+    return crypto.data.map(item => {
       const url = item.URL.split('/').pop();
       const extensionFile = url.split('.').pop();
-      console.log('extensionFile', extensionFile);
       return (
         <ListItem avatar key={item.id}>
           <Left>
             {extensionFile === 'svg' ? (
-              <SvgUri style={styles.imageLogo} uri={item.URL} />
+              <SvgUri scale={0.5} width={50} height={50} uri={item.URL} />
             ) : (
               <Thumbnail
                 style={styles.imageLogo}
@@ -53,36 +73,46 @@ class HomeScreen extends React.Component {
             </Text>
             <Text note>{item.currentPrice} $</Text>
           </Body>
-          <Right>
-            <Text note>3:43 pm</Text>
-          </Right>
+          <Right>{this.checkPercentage(item)}</Right>
         </ListItem>
       );
     });
   };
 
   render() {
-    console.log('cryptos', this.props);
+    const {user} = this.props;
     return (
       <Container>
+        <Header>
+          <Body>
+            <Title>Crypto-currencies</Title>
+          </Body>
+          <Right>
+            {user.role === 'ADMIN' ? (
+              <TouchableOpacity>
+                <Icon
+                  name="add-to-list"
+                  type="Entypo"
+                  style={{color: 'white'}}
+                />
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )}
+          </Right>
+        </Header>
         <Content>
           <List>
-            {this.props.res === undefined ? (
+            {this.props.crypto === undefined ? (
               <Text>Hello</Text>
             ) : (
               this.renderRowList()
             )}
-            {/* <Button title="Actually, sign me out :)" onPress={this._signOutAsync} /> */}
           </List>
         </Content>
       </Container>
     );
   }
-
-  _signOutAsync = async () => {
-    this.props.dispatch({type: 'LOGOUT_REQUEST'});
-    this.props.navigation.navigate('Auth');
-  };
 }
 
 const styles = StyleSheet.create({
@@ -93,7 +123,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  res: state.cryptos.payload,
+  crypto: state.cryptos.payload,
+  user: state.auth.payload.data,
 });
 
 const mapDispatchToProps = dispatch => {

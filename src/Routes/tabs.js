@@ -1,8 +1,7 @@
-/* eslint-disable react/react-in-jsx-scope */
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Icon} from 'native-base';
 import HomeScreen from '../App/HomeScreen';
 import InfosScreen from '../App/InfosScreen';
 
@@ -21,7 +20,12 @@ export function MyTabs() {
           options={{
             tabBarLabel: 'Feed',
             tabBarIcon: ({color, size}) => (
-              <Icon name="home" color={color} size={size} />
+              <Icon
+                type="Entypo"
+                name="home"
+                style={{color: color}}
+                size={size}
+              />
             ),
           }}
         />
@@ -31,7 +35,12 @@ export function MyTabs() {
           options={{
             tabBarLabel: 'Profile',
             tabBarIcon: ({color, size}) => (
-              <Icon name="account" color={color} size={size} />
+              <Icon
+                type="MaterialCommunityIcons"
+                name="account"
+                style={{color: color}}
+                size={size}
+              />
             ),
           }}
         />

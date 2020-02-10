@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
+import {Image, ImageBackground, Platform, StyleSheet, View} from 'react-native';
 import {
-  Image,
-  ImageBackground,
-  Platform,
-  ScrollView,
-  StyleSheet,
   Text,
-  View,
-} from 'react-native';
-import {Card, Icon} from 'native-base';
+  Card,
+  Icon,
+  Container,
+  Content,
+  Footer,
+  FooterTab,
+  Button,
+} from 'native-base';
 import {connect} from 'react-redux';
 import Separator from '../Components/separateur';
 import Email from '../Components/email';
@@ -45,7 +46,7 @@ export class InfosScreen extends Component {
                 <Icon
                   name="person"
                   underlayColor="transparent"
-                  iconStyle={styles.placeIcon}
+                  style={styles.placeIcon}
                   onPress={this.onPressPlace}
                 />
               </View>
@@ -68,17 +69,29 @@ export class InfosScreen extends Component {
       />
     );
   };
+  _signOutAsync = () => {
+    this.props.dispatch({type: 'LOGOUT_REQUEST'});
+    this.props.navigation.navigate('Auth');
+  };
   render() {
     return (
-      <ScrollView style={styles.scroll}>
-        <View style={styles.container}>
+      <Container>
+        <Content style={styles.container}>
           <Card containerStyle={styles.cardContainer}>
             {this.renderHeader()}
             {this.renderEmail()}
             {Separator()}
           </Card>
-        </View>
-      </ScrollView>
+        </Content>
+        <Footer>
+          <FooterTab>
+            <Button danger iconLeft onPress={() => this._signOutAsync()}>
+              <Icon name="logout" type="AntDesign" style={{color: 'white'}} />
+              <Text>Log Out</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </Container>
     );
   }
 }
@@ -120,9 +133,6 @@ const styles = StyleSheet.create({
   placeIcon: {
     color: 'white',
     fontSize: 26,
-  },
-  scroll: {
-    backgroundColor: '#FFF',
   },
   telContainer: {
     backgroundColor: '#FFF',

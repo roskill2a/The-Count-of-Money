@@ -50,7 +50,7 @@ const Email = ({containerStyle, onPressEmail, name, email}) => (
         <Icon
           type="MaterialCommunityIcons"
           name="email"
-          iconStyle={styles.emailIcon}
+          style={styles.emailIcon}
           onPress={() => onPressEmail()}
         />
       </View>
