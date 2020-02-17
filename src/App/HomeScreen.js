@@ -15,46 +15,55 @@ import {
   Icon,
 } from 'native-base';
 import {getListCryptos} from '../Actions/crypto';
+import {getPriceEvolCryptos} from '../Actions/priceEvolution';
 import {SvgUri} from 'react-native-svg';
 import {connect} from 'react-redux';
 
 class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      id: props.user.id,
+      cryptoList: [],
+    };
   }
-  static navigationOptions = {
-    title: 'Welcome to the app!',
+
+  getListCryptos = async () => {
+    console.log('id', this.state.id);
+    try {
+      let response = await fetch(
+        'http://185.216.25.54:8082/api/users/' + this.state.id,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      let responseJson = await response.json();
+      console.log(responseJson);
+      this.setState({cryptoList: responseJson.user.cryptos});
+    } catch (error) {
+      console.error('error', error);
+    }
   };
   componentDidMount() {
     this.props.getListCryptos();
   }
 
-  checkPercentage = item => {
-    const percent = (item.currentPrice - item.openingPrice) * 100;
-    if (item.currentPrice > item.openingPrice) {
-      return (
-        <View style={{alignItems: 'center'}}>
-          <Icon type="AntDesign" name="arrowup" style={{color: 'green'}} />
-          <Text style={{color: 'green'}}>{percent.toFixed(2)} %</Text>
-        </View>
-      );
-    } else {
-      return (
-        <View style={{alignItems: 'center'}}>
-          <Icon type="AntDesign" name="arrowdown" style={{color: 'red'}} />
-          <Text style={{color: 'red'}}>{percent.toFixed(2)} %</Text>
-        </View>
-      );
-    }
-  };
-
   renderRowList = () => {
-    const {crypto} = this.props;
-    return crypto.data.map(item => {
+    return this.state.cryptoList.map(item => {
       const url = item.URL.split('/').pop();
       const extensionFile = url.split('.').pop();
       return (
-        <ListItem avatar key={item.id}>
+        <ListItem
+          avatar
+          key={item.id}
+          onPress={() =>
+            this.props.navigation.navigate('Details', {
+              arg: item.IDs,
+            })
+          }>
           <Left>
             {extensionFile === 'svg' ? (
               <SvgUri scale={0.5} width={50} height={50} uri={item.URL} />
@@ -73,14 +82,17 @@ class HomeScreen extends React.Component {
             </Text>
             <Text note>{item.currentPrice} $</Text>
           </Body>
-          <Right>{this.checkPercentage(item)}</Right>
+          <Right style={{justifyContent: 'center'}}>
+            <Icon name="ios-arrow-forward" type="Ionicons" />
+          </Right>
         </ListItem>
       );
     });
   };
 
   render() {
-    const {user} = this.props;
+    const {user, navigation, crypto} = this.props;
+    this.getListCryptos();
     return (
       <Container>
         <Header>
@@ -88,23 +100,21 @@ class HomeScreen extends React.Component {
             <Title>Crypto-currencies</Title>
           </Body>
           <Right>
-            {user.role === 'ADMIN' ? (
-              <TouchableOpacity>
-                <Icon
-                  name="add-to-list"
-                  type="Entypo"
-                  style={{color: 'white'}}
-                />
-              </TouchableOpacity>
-            ) : (
-              <></>
-            )}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('CryptoList', {
+                  list: crypto.data,
+                  userID: user.id,
+                })
+              }>
+              <Icon name="add-to-list" type="Entypo" style={{color: 'white'}} />
+            </TouchableOpacity>
           </Right>
         </Header>
         <Content>
           <List>
-            {this.props.crypto === undefined ? (
-              <Text>Hello</Text>
+            {user === undefined ? (
+              <Text>Add Crypto</Text>
             ) : (
               this.renderRowList()
             )}
@@ -130,6 +140,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => {
   return {
     getListCryptos: () => dispatch(getListCryptos()),
+    getPriceEvolCryptos: arg => dispatch(getPriceEvolCryptos(arg)),
   };
 };
 

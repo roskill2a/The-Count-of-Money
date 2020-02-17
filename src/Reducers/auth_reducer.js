@@ -31,7 +31,11 @@ const authReducer = (state = INITIAL_STATE, action) => {
         isAuthenticated: false,
       });
     case LOGOUT_REQUEST:
-      return [...INITIAL_STATE];
+      return Object.assign({}, state, {
+        isAuthenticated: false,
+        user: undefined,
+        crypto: undefined,
+      });
     default:
       return state;
   }

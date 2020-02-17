@@ -1,20 +1,10 @@
 import {
-  CRYPTO_REQUEST_ERROR,
-  CRYPTO_REQUEST_SUCCESS,
   CRYPTO_PCE_EVOL_REQUEST_ERROR,
   CRYPTO_PCE_EVOL_REQUEST_SUCCESS,
 } from './types';
 
-const cryptoReducer = (state = [], action) => {
+const sparlLineReducer = (state = [], action) => {
   switch (action.type) {
-    case CRYPTO_REQUEST_SUCCESS:
-      return Object.assign({}, state, {
-        payload: action.payload,
-      });
-    case CRYPTO_REQUEST_ERROR:
-      return Object.assign({}, state, {
-        payload: action.payload,
-      });
     case CRYPTO_PCE_EVOL_REQUEST_SUCCESS:
       return Object.assign({}, state, {
         payload: action.payload,
@@ -28,4 +18,4 @@ const cryptoReducer = (state = [], action) => {
   }
 };
 
-export default cryptoReducer;
+export default sparlLineReducer;
